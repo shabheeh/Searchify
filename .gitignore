@@ -36,6 +36,8 @@ server/node_modules/
 server/dist/
 server/build/
 server/coverage/
+server/.env
+server/.env.development
 
 
 .vscode/
