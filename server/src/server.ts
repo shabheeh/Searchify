@@ -1,24 +1,26 @@
-import dotenv from "dotenv";
-dotenv.config();
 import express, { Request, Response } from "express";
 import cors from "cors";
 import compression from "compression";
 import helmet from "helmet";
+import config from "./configs/environment";
 
 import { connectMongoDB } from "./configs/database";
+import { logger } from "./utils/logger";
+import { httpLogger } from "./middlewares/httpLogger";
 
 class Server {
   private app: express.Application;
 
   constructor() {
     this.app = express();
-    this.initializeMiddleware(); 
+    this.initializeMiddleware();
     this.initializeRoutes();
   }
 
   private initializeMiddleware(): void {
     this.app.use(helmet());
-    this.app.use(cors());
+    // this.app.use(cors());
+    this.app.use(httpLogger)
     this.app.use(compression());
     this.app.use(express.json({ limit: "10mb" }));
     this.app.use(express.urlencoded({ extended: true, limit: "10mb" }));
@@ -49,11 +51,11 @@ class Server {
   public async start(): Promise<void> {
     try {
       await connectMongoDB();
-      this.app.listen(process.env.PORT, () => {
-        console.log("Server running on port 5000");
+      this.app.listen(config.PORT, () => {
+        logger.info(`Server running on port ${config.PORT}`);
       });
     } catch (error) {
-      console.log("failed to start server", error);
+      logger.error("failed to start server", error);
       process.exit(1);
     }
   }

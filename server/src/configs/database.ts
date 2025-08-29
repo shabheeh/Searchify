@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-
-dotenv.config();
+import config from "./environment";
+import { logger } from "@/utils/logger";
 
 export const connectMongoDB = async (): Promise<void> => {
   try {
@@ -12,18 +11,18 @@ export const connectMongoDB = async (): Promise<void> => {
       family: 4,
     };
 
-    await mongoose.connect(process.env.MONGODB_URI!, options);
-    console.log("Mongodb connecton successful");
+    await mongoose.connect(config.MONGODB_URI, options);
+    logger.info("Mongodb connecton successful");
 
     mongoose.connection.on("error", (error) => {
-      console.log("Mongodb connections error", error);
+      logger.error("Mongodb connections error", error);
     });
 
     mongoose.connection.on("disconnected", () => {
-      console.log("mongodb disconnected");
+      logger.warn("mongodb disconnected");
     });
   } catch (error) {
-    console.error("Failed to connect mongodb", error);
+    logger.error("Failed to connect mongodb", error);
     process.exit(1);
   }
 };
@@ -31,8 +30,8 @@ export const connectMongoDB = async (): Promise<void> => {
 export const disconnectMongodDB = async (): Promise<void> => {
   try {
     await mongoose.disconnect();
-    console.log("mongodb disconnectecd");
+    logger.info("mongodb disconnectecd");
   } catch (error) {
-    console.error("Error disconnecting from mongodb", error);
+    logger.error("Error disconnecting from mongodb", error);
   }
 };
