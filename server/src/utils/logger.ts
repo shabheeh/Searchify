@@ -23,7 +23,7 @@ export const logger = winston.createLogger({
       filename: "logs/combined.log",
       maxsize: 5242880,
       maxFiles: 5,
-    }),
+    }), 
   ],  
 });
 

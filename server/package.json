@@ -7,6 +7,7 @@
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
     "build": "tsc",
     "start": "node -r tsconfig-paths/register dist/server.js",
+    "collect": "ts-node -r tsconfig-paths/register scripts/collectArtists.ts",
     "test": ""
   },
   "author": "",
