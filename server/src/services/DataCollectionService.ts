@@ -41,7 +41,7 @@ export class DataCollectionService {
     artists: Map<string, CreateArtistDTO>,
     targetCount: number
   ): Promise<void> {
-    logger.info("🔤 Using alphabetical search strategy...");
+    logger.info("Using alphabetical search strategy...");
 
     const searchPatterns = [
       "a*",
@@ -184,7 +184,7 @@ export class DataCollectionService {
     }
 
     logger.info(
-      `✅ Alphabetical strategy completed: ${totalCollected} unique artists`
+      `Alphabetical strategy completed: ${totalCollected} unique artists`
     );
   }
 
@@ -196,9 +196,11 @@ export class DataCollectionService {
 
     return {
       name: spotifyArtist.name,
+      normalizedName: spotifyArtist.name.toLowerCase().trim(),
       genres: spotifyArtist.genres || [],
       profilePicture,
       spotifyUrl: spotifyArtist.external_urls?.spotify || "",
+      spotifyId: spotifyArtist.id,
     };
   }
 

@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import DataCollectionService from '../src/services/DataCollectionService';
 import ArtistService from '../src/services/ArtistService';
 import { logger } from '../src/utils/logger';
@@ -29,7 +28,7 @@ async function collectAndStoreArtists(): Promise<void> {
       return;
     }
     
-    logger.info(`✅ Collected ${artists.length} artists from Spotify`);
+    logger.info(`Collected ${artists.length} artists from Spotify`);
     
     logger.info('Saving to db'); 
     const batchSize = 1000;
@@ -50,7 +49,7 @@ async function collectAndStoreArtists(): Promise<void> {
     }
     
     const finalStats = await ArtistService.getArtistStats();
-    logger.info(`📊 Final Statistics:`, finalStats);
+    logger.info(`Final Statistics:`, finalStats);
     
   } catch (error) {
     logger.error('Collection failed:', error);

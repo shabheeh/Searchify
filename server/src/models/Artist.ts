@@ -11,6 +11,12 @@ const ArtistSchema = new Schema<ArtistDocument>(
       index: true,
       trim: true,
     },
+    normalizedName: {
+      type: String,
+      required: true,
+      index: true,
+      lowercase: true,
+    },
     genres: [
       {
         type: String,
@@ -24,13 +30,26 @@ const ArtistSchema = new Schema<ArtistDocument>(
       default: null,
     },
     spotifyUrl: {
-        type: String,
-        required: false,
-    }
+      type: String,
+      required: false,
+    },
+    spotifyId: { 
+      type: String, 
+      required: true, 
+      unique: true, 
+      index: true 
+    },
   },
   {
     timestamps: true,
   }
 );
+
+ArtistSchema.pre('save', function(next) {
+  if (this.isModified('name')) {
+    this.normalizedName = this.name.toLowerCase().trim();
+  }
+  next();
+});
 
 export const ArtistModel = model<ArtistDocument>("Artist", ArtistSchema);

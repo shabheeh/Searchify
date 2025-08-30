@@ -8,11 +8,13 @@
     "build": "tsc",
     "start": "node -r tsconfig-paths/register dist/server.js",
     "collect": "ts-node -r tsconfig-paths/register scripts/collectArtists.ts",
+    "migrate": "ts-node -r tsconfig-paths/register scripts/migrateToElasticsearch.ts",
     "test": ""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@elastic/elasticsearch": "^8.19.1",
     "axios": "^1.11.0",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
