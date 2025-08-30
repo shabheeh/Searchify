@@ -1,5 +1,6 @@
 import { logger } from "@/utils/logger";
 import { Client } from "@elastic/elasticsearch";
+import config from "./environment";
 
 class ElasticsearchConfig {
   private static instance: ElasticsearchConfig;
@@ -7,6 +8,7 @@ class ElasticsearchConfig {
 
   private constructor() {
     this.client = new Client({
+      node:  config.ELASTICSEARCH_URL,
       requestTimeout: 60000,
       pingTimeout: 3000,
       maxRetries: 3,

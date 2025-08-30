@@ -8,6 +8,8 @@ import { connectMongoDB } from "./configs/database";
 import { logger } from "./utils/logger";
 import { httpLogger } from "./middlewares/httpLogger";
 import { errorHandler, notFoundHandler } from "./middlewares/errorHandler";
+import { elasticsearchConfig } from "./configs/elasticsearch";
+import { artistRouter } from "./routes/artistRoutes";
 
 class Server {
   private app: express.Application;
@@ -31,6 +33,11 @@ class Server {
   private initializeRoutes(): void {
     this.app.get("/health", async (req: Request, res: Response) => {
       try {
+
+        const [esHealth] = await Promise.allSettled([
+          elasticsearchConfig.checkConnection()
+        ]);
+
         res.status(200).json({
           success: true,
           data: {
@@ -48,6 +55,8 @@ class Server {
         });
       }
     });
+
+    this.app.use("/api", artistRouter)
   }
 
   private initializeErrorHandling(): void {
@@ -58,7 +67,7 @@ class Server {
   public async start(): Promise<void> {
     try {
       await connectMongoDB();
-      const server = this.app.listen(config.PORT, () => {
+      const server = this.app.listen(config.PORT, '0.0.0.0', () => {
         logger.info(`Server running on port ${config.PORT}`);
       });
 

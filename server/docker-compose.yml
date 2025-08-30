@@ -1,0 +1,43 @@
+
+services:
+  music-artist-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: music_artist_api
+    restart: unless-stopped
+    env_file:
+      - .env 
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+    depends_on:
+      - elasticsearch
+    networks:
+      - music-network
+
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+    container_name: music_elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - music-network
+
+volumes:
+  es_data:
+
+networks:
+  music-network:
+    driver: bridge

@@ -1,15 +1,20 @@
 import { ArtistRepository } from "@/repositories/ArtistRepository";
 import { IArtistRepository } from "@/repositories/interfaces/IArtistRepository";
-import { CreateArtistDTO, IArtist } from "@/types/Artist";
+import { ISearchRepository } from "@/repositories/interfaces/ISearchRepository";
+import { SearchRepository } from "@/repositories/SearchRepository";
+import { CreateArtistDTO, IArtist, SearchResponse } from "@/types/Artist";
 import { logger } from "@/utils/logger";
 
 export class ArtistService {
-  constructor(private artistRepository: IArtistRepository) {}
+  constructor(
+    private artistRepository: IArtistRepository,
+    private searchRepository: ISearchRepository
+  ) {}
 
   async createArtist(artistData: CreateArtistDTO): Promise<IArtist> {
     try {
       const artist = await this.artistRepository.create(artistData);
-
+      await this.searchRepository.indexArtist(artist);
       logger.info("Created artist", artist);
       return artist;
     } catch (error) {
@@ -34,11 +39,41 @@ export class ArtistService {
     try {
       return await this.artistRepository.getStats();
     } catch (error) {
-      logger.error('Error getting artist stats:', error);
+      logger.error("Error getting artist stats:", error);
+      throw error;
+    }
+  }
+
+  async getArtistById(id: string): Promise<IArtist | null> {
+    try {
+      return await this.artistRepository.findById(id);
+    } catch (error) {
+      logger.error("Error getting artist by ID:", error);
+      throw error;
+    }
+  }
+
+  async searchArtists(query: string): Promise<SearchResponse> {
+    try {
+
+      return await this.searchRepository.search(query);
+    } catch (error) {
+      logger.error("Error searching artists:", error);
+      throw error;
+    }
+  }
+
+  async getSuggestions(query: string, limit: number = 10): Promise<IArtist[]> {
+    try {
+      return await this.searchRepository.suggest(query, limit);
+    } catch (error) {
+      logger.error("Error getting suggestions:", error);
+
       throw error;
     }
   }
 }
 
 const artistRepository = new ArtistRepository();
-export default new ArtistService(artistRepository);
+const searchRepository = new SearchRepository();
+export default new ArtistService(artistRepository, searchRepository);

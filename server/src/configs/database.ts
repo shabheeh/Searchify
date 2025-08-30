@@ -1,14 +1,16 @@
-import mongoose from "mongoose";
+import mongoose, { ConnectOptions } from "mongoose";
 import config from "./environment";
 import { logger } from "@/utils/logger";
 
 export const connectMongoDB = async (): Promise<void> => {
   try {
-    const options = {
+    const options: ConnectOptions = {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
       family: 4,
+      retryWrites: true,
+      w: "majority",
     };
 
     await mongoose.connect(config.MONGODB_URI, options);
