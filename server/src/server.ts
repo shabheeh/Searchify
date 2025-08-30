@@ -3,7 +3,7 @@ import cors from "cors";
 import compression from "compression";
 import helmet from "helmet";
 import config from "./configs/environment";
-
+import { Server as HttpServer } from "http";
 import { connectMongoDB } from "./configs/database";
 import { logger } from "./utils/logger";
 import { httpLogger } from "./middlewares/httpLogger";
@@ -58,15 +58,35 @@ class Server {
   public async start(): Promise<void> {
     try {
       await connectMongoDB();
-      this.app.listen(config.PORT, () => {
+      const server = this.app.listen(config.PORT, () => {
         logger.info(`Server running on port ${config.PORT}`);
       });
+
+      this.setupGracefulShutdown(server);
     } catch (error) {
       logger.error("failed to start server", error);
       process.exit(1);
     }
   }
+
+  private setupGracefulShutdown(server: HttpServer): void {
+    const gracefulShutdown = (signal: string) => {
+      logger.info(`Received ${signal}. Graceful shutdown...`);
+      
+      server.close(() => {
+        logger.info('HTTP server closed');
+        process.exit(0);
+      });
+    };
+
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  }
+
 }
+
+
+
 
 if (require.main === module) {
   const server = new Server();
