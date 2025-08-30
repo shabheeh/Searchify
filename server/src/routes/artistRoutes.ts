@@ -7,5 +7,6 @@ const artistController = new ArtistController();
 
 router.get("/search", artistController.search);
 router.get("/suggest", artistController.suggest);
+router.get("/artists/:id", artistController.getArtist)
 
 export { router as artistRouter };

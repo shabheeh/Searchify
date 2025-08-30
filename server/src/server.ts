@@ -23,8 +23,13 @@ class Server {
 
   private initializeMiddleware(): void {
     this.app.use(helmet());
-    this.app.use(cors());
-    this.app.use(httpLogger)
+    this.app.use(
+      cors({
+        origin: config.CORS_ORIGIN,
+        credentials: true,
+      })
+    );
+    this.app.use(httpLogger);
     this.app.use(compression());
     this.app.use(express.json({ limit: "10mb" }));
     this.app.use(express.urlencoded({ extended: true, limit: "10mb" }));
@@ -33,9 +38,8 @@ class Server {
   private initializeRoutes(): void {
     this.app.get("/health", async (req: Request, res: Response) => {
       try {
-
         const [esHealth] = await Promise.allSettled([
-          elasticsearchConfig.checkConnection()
+          elasticsearchConfig.checkConnection(),
         ]);
 
         res.status(200).json({
@@ -56,18 +60,18 @@ class Server {
       }
     });
 
-    this.app.use("/api", artistRouter)
+    this.app.use("/api", artistRouter);
   }
 
   private initializeErrorHandling(): void {
     this.app.use(notFoundHandler);
-    this.app.use(errorHandler)
+    this.app.use(errorHandler);
   }
 
   public async start(): Promise<void> {
     try {
       await connectMongoDB();
-      const server = this.app.listen(config.PORT, '0.0.0.0', () => {
+      const server = this.app.listen(config.PORT, "0.0.0.0", () => {
         logger.info(`Server running on port ${config.PORT}`);
       });
 
@@ -81,21 +85,17 @@ class Server {
   private setupGracefulShutdown(server: HttpServer): void {
     const gracefulShutdown = (signal: string) => {
       logger.info(`Received ${signal}. Graceful shutdown...`);
-      
+
       server.close(() => {
-        logger.info('HTTP server closed');
+        logger.info("HTTP server closed");
         process.exit(0);
       });
     };
 
-    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+    process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+    process.on("SIGINT", () => gracefulShutdown("SIGINT"));
   }
-
 }
-
-
-
 
 if (require.main === module) {
   const server = new Server();
