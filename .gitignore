@@ -1,0 +1,47 @@
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.env
+.env.local
+.DS_Store
+
+# --- Build 
+dist/
+build/
+out/
+
+# --- Logs ---
+logs
+*.log
+*.tmp
+*.pid
+*.seed
+*.tgz
+
+# --- Client 
+client/node_modules/
+client/dist/
+client/build/
+client/.vite/
+client/.next/
+
+# --- Server
+server/node_modules/
+server/dist/
+server/build/
+server/coverage/
+server/.env
+server/.env.development
+
+
+.vscode/
+.idea/
+*.swp
+
+coverage/
