@@ -7,6 +7,7 @@ import config from "./configs/environment";
 import { connectMongoDB } from "./configs/database";
 import { logger } from "./utils/logger";
 import { httpLogger } from "./middlewares/httpLogger";
+import { errorHandler, notFoundHandler } from "./middlewares/errorHandler";
 
 class Server {
   private app: express.Application;
@@ -15,11 +16,12 @@ class Server {
     this.app = express();
     this.initializeMiddleware();
     this.initializeRoutes();
+    this.initializeErrorHandling();
   }
 
   private initializeMiddleware(): void {
     this.app.use(helmet());
-    // this.app.use(cors());
+    this.app.use(cors());
     this.app.use(httpLogger)
     this.app.use(compression());
     this.app.use(express.json({ limit: "10mb" }));
@@ -46,6 +48,11 @@ class Server {
         });
       }
     });
+  }
+
+  private initializeErrorHandling(): void {
+    this.app.use(notFoundHandler);
+    this.app.use(errorHandler)
   }
 
   public async start(): Promise<void> {

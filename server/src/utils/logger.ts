@@ -12,7 +12,6 @@ const logFormat = winston.format.combine(
 export const logger = winston.createLogger({
   level: config.NODE_ENV === "production" ? "info" : "debug",
   format: logFormat,
-  defaultMeta: { service: "Searchify-backend" },
   transports: [
     new winston.transports.File({
       filename: "logs/error.log",
